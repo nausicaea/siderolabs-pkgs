@@ -1,6 +1,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2026-04-08T13:48:46Z by kres b6d29bf.
+# Generated on 2026-04-18T14:43:19Z by kres 4b58472.
 
 # common variables
 
@@ -13,6 +13,7 @@ ARTIFACTS := _out
 IMAGE_TAG ?= $(TAG)$(TAG_SUFFIX)
 OPERATING_SYSTEM := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 GOARCH := $(shell uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
+CI_RELEASE_TAG := $(shell git log --oneline --format=%B -n 1 HEAD^2 -- 2>/dev/null | head -n 1 | sed -r "/^release\(.*\)/ s/^release\((.*)\):.*$$/\\1/; t; Q")
 REGISTRY ?= ghcr.io
 USERNAME ?= siderolabs
 REGISTRY_AND_USERNAME ?= $(REGISTRY)/$(USERNAME)
@@ -183,6 +184,14 @@ $(ARTIFACTS):  ## Creates artifacts directory.
 clean:  ## Cleans up all artifacts.
 	@rm -rf $(ARTIFACTS)
 
+.PHONY: ci-temp-release-tag
+ci-temp-release-tag:  ## Generates a temporary release tag for CI run.
+	@if [ -n "$(CI_RELEASE_TAG)" -a -n "$${GITHUB_ENV}" ]; then \
+		echo Setting temporary release tag "$(CI_RELEASE_TAG)"; \
+		echo "TAG=$(CI_RELEASE_TAG)" >> "$${GITHUB_ENV}"; \
+		echo "ABBREV_TAG=$(CI_RELEASE_TAG)" >> "$${GITHUB_ENV}"; \
+	fi
+
 target-%:  ## Builds the specified target defined in the Pkgfile. The build result will only remain in the build cache.
 	@$(BUILD) --target=$* $(COMMON_ARGS) $(TARGET_ARGS) $(CI_ARGS) .
 
@@ -255,4 +264,16 @@ release-notes: $(ARTIFACTS)
 conformance:
 	@docker pull $(CONFORMANCE_IMAGE)
 	@docker run --rm -it -v $(PWD):/src -w /src $(CONFORMANCE_IMAGE) enforce
+
+.PHONY: renovate-local
+renovate-local:  ## runs renovate locally to check syntax and test configuration
+	@docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		-v $(PWD):/src \
+		-w /src \
+		-e GITHUB_TOKEN \
+		-e LOG_LEVEL=debug \
+		-e RENOVATE_PLATFORM=local \
+		-e RENOVATE_DRY_RUN=full \
+	renovate/renovate
 
