@@ -83,7 +83,6 @@ jobs:
           driver-opts: |
             image=moby/buildkit:v0.26.2
             network=host
-
       - name: Build
         if: github.event_name == 'pull_request'
         run: |
@@ -181,11 +180,12 @@ jobs:
         id: setup-buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # version: v4.0.0
         with:
-          append: |
-            - endpoint: tcp://buildkit-arm64.ci.svc.cluster.local:1234
-              platforms: linux/arm64
-          driver: remote
-          endpoint: tcp://buildkit-amd64.ci.svc.cluster.local:1234
+          use: true
+          name: local1
+          driver: docker-container
+          driver-opts: |
+            image=moby/buildkit:v0.26.2
+            network=host
       - name: reproducibility-test
         run: |
           make reproducibility-test
