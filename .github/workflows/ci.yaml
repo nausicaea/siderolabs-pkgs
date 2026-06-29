@@ -29,6 +29,10 @@ jobs:
     if: (!startsWith(github.head_ref, 'renovate/') && !startsWith(github.head_ref, 'dependabot/'))
     outputs:
       labels: ${{ steps.retrieve-pr-labels.outputs.result }}
+    env:
+      PLATFORM: linux/amd64
+      USERNAME: "${{ github.repository_owner }}"
+      CI_ARGS: --cache-from=type=gha,scope=manual --cache-to=type=gha,mode=min,scope=manual
     steps:
       - name: gather-system-info
         id: system-info
