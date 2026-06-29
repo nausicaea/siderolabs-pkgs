@@ -32,7 +32,7 @@ jobs:
     env:
       PLATFORM: linux/amd64
       USERNAME: "${{ github.repository_owner }}"
-      CI_ARGS: --cache-from=type=gha,scope=manual --cache-to=type=gha,mode=min,scope=manual
+      CI_ARGS: --cache-from=type=gha,scope=default --cache-to=type=gha,mode=min,scope=default
     steps:
       - name: gather-system-info
         id: system-info
