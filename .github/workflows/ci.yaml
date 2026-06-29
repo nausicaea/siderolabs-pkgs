@@ -140,8 +140,7 @@ jobs:
           body_path: _out/RELEASE_NOTES.md
           draft: "true"
   reproducibility:
-    runs-on:
-      group: pkgs
+    runs-on: ubuntu-latest
     if: contains(fromJSON(needs.default.outputs.labels || '[]'), 'integration/reproducibility')
     needs:
       - default
