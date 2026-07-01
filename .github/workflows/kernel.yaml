@@ -20,7 +20,7 @@ env:
   PLATFORM: linux/amd64
   REGISTRY: ghcr.io
   USERNAME: "${{ github.repository_owner }}"
-  CI_ARGS: --cache-from=type=gha,scope=kernel --cache-to=type=gha,mode=min,scope=kernel
+  CI_ARGS: "--cache-from=type=gha,scope=kernel --cache-to=type=gha,mode=min,scope=kernel,ghtoken=${{ secrets.GITHUB_TOKEN }}"
 jobs:
   kernel:
     runs-on: ubuntu-latest
