@@ -1,0 +1,64 @@
+name: kernel
+on:
+  push:
+    branches:
+      - main
+      - shizuoka
+      - osaka
+      - kagawa
+      - release-*
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - main
+      - shizuoka
+      - osaka
+      - kagawa
+      - release-*
+env:
+  PLATFORM: linux/amd64
+  REGISTRY: ghcr.io
+  USERNAME: "${{ github.repository_owner }}"
+  CI_ARGS: --cache-from=type=gha,scope=kernel --cache-to=type=gha,mode=min,scope=kernel
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # version: v6.0.2
+      - name: Expose GitHub Actions runtime
+        uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # version: v4.0.0
+      - name: Set a Docker-compatible image tag from the Git tag
+        run: |
+          echo "TAG=$(git describe --tag --always --dirty --match 'v[0-9]*' | sed 's/[^a-zA-Z0-9_.-]/_/g')" >> $GITHUB_ENV
+      - name: Maximize build space
+        uses: AdityaGarg8/remove-unwanted-software@90e01b21170618765a73370fcc3abbd1684a7793 # version: v5.0.0
+        with:
+          remove-android: 'true'
+      - name: Set up Docker Buildx
+        id: setup-buildx
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # version: v4.0.0
+        with:
+          use: true
+          name: talos_local1
+          driver: docker-container
+          driver-opts: |
+            image=moby/buildkit:v0.26.2
+            network=host
+      - name: Build
+        run: |
+          make kernel PUSH=false
+      - name: Login to registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # version: v4.1.0
+        with:
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.USERNAME }}
+      - name: Push to registry
+        if: github.event_name != 'pull_request'
+        run: |
+          make kernel PUSH=true
