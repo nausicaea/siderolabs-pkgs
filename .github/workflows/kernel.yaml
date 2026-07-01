@@ -3,12 +3,18 @@ on:
   push:
     branches:
       - main
+      - shizuoka
+      - osaka
+      - kagawa
       - release-*
     tags:
       - v*
   pull_request:
     branches:
       - main
+      - shizuoka
+      - osaka
+      - kagawa
       - release-*
 env:
   PLATFORM: linux/amd64
