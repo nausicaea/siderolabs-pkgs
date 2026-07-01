@@ -34,6 +34,7 @@ jobs:
       - name: Set a Docker-compatible image tag from the Git tag
         run: |
           echo "TAG=$(git describe --tag --always --dirty --match 'v[0-9]*' | sed 's/[^a-zA-Z0-9_.-]/_/g')" >> $GITHUB_ENV
+          echo "ABBREV_TAG=$(echo $(git describe --tags >/dev/null 2>/dev/null && git describe --tag --always --match v[0-9]\* --abbrev=0 || echo 'undefined') | sed 's/[^a-zA-Z0-9_.-]/_/g')" >> $GITHUB_ENV
       - name: Maximize build space
         uses: AdityaGarg8/remove-unwanted-software@90e01b21170618765a73370fcc3abbd1684a7793 # version: v5.0.0
         with:
