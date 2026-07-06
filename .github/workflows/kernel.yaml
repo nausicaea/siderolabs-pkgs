@@ -51,8 +51,10 @@ jobs:
             image=moby/buildkit:v0.26.2
             network=host
       - name: Build
+        env:
+          PUSH: "false"
         run: |
-          make kernel PUSH=false
+          make kernel
       - name: Login to registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # version: v4.1.0
@@ -62,5 +64,7 @@ jobs:
           username: ${{ env.USERNAME }}
       - name: Push to registry
         if: github.event_name != 'pull_request'
+        env:
+          PUSH: "true"
         run: |
-          make kernel PUSH=true
+          make kernel
