@@ -33,6 +33,7 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # version: v4.0.0
       - name: Set a Docker-compatible image tag from the Git tag
         run: |
+          set -x
           echo "TAG=$(git describe --tag --always --dirty --match 'v[0-9]*' | sed 's/[^a-zA-Z0-9_.-]/_/g')" >> $GITHUB_ENV
           echo "ABBREV_TAG=$(echo $(git describe --tags >/dev/null 2>/dev/null && git describe --tag --always --match v[0-9]\* --abbrev=0 || echo 'undefined') | sed 's/[^a-zA-Z0-9_.-]/_/g')" >> $GITHUB_ENV
       - name: Maximize build space
