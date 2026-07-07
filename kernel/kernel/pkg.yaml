@@ -15,7 +15,8 @@ steps:
         mkdir -p /rootfs/dtb
         mkdir -p /rootfs/certs
 
-        find $(pwd) -name "System.map" >&2
+        echo MARKER
+        find /src -name "System.map" -print
 
         case $ARCH in
             x86_64)
