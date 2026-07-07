@@ -15,8 +15,7 @@ steps:
         mkdir -p /rootfs/dtb
         mkdir -p /rootfs/certs
 
-        echo MARKER
-        find /src -name "System.map" -print
+        mv System.map /rootfs/boot/System.map
 
         case $ARCH in
             x86_64)
