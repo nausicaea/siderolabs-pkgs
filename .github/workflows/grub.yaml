@@ -1,4 +1,4 @@
-name: kernel
+name: grub
 on:
   push:
     branches:
@@ -16,7 +16,7 @@ env:
   USERNAME: "${{ github.repository_owner }}"
   CI_ARGS: --cache-from=type=gha,scope=kernel --cache-to=type=gha,mode=min,scope=kernel
 jobs:
-  kernel:
+  grub:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -29,10 +29,6 @@ jobs:
         run: |
           echo "TAG=$(git describe --tag --always --dirty --match 'v[0-9]*' | sed 's/[^a-zA-Z0-9_.-]/_/g')" >> "$GITHUB_ENV"
           echo "ABBREV_TAG=$(echo $(git describe --tags >/dev/null 2>/dev/null && git describe --tag --always --match v[0-9]\* --abbrev=0 || echo 'undefined') | sed 's/[^a-zA-Z0-9_.-]/_/g')" >> "$GITHUB_ENV"
-      - name: Maximize build space
-        uses: AdityaGarg8/remove-unwanted-software@90e01b21170618765a73370fcc3abbd1684a7793 # version: v5.0.0
-        with:
-          remove-android: 'true'
       - name: Set up Docker Buildx
         id: setup-buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # version: v4.0.0
@@ -47,7 +43,7 @@ jobs:
         env:
           PUSH: "false"
         run: |
-          make kernel
+          make grub
       - name: Login to registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # version: v4.1.0
@@ -60,4 +56,4 @@ jobs:
         env:
           PUSH: "true"
         run: |
-          make kernel
+          make grub
